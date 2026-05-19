@@ -14,6 +14,7 @@ void UGA_Shield::ActivateAbility(
     const FGameplayAbilityActivationInfo ActivationInfo,
     const FGameplayEventData* TriggerEventData)
 {
+    UE_LOG(LogTemp, Error, TEXT("GA_SHIELD ACTIVATE ABILITY ENTERED"));
     Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
     if (!CommitAbility(Handle, ActorInfo, ActivationInfo))

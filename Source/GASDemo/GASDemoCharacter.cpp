@@ -8,6 +8,10 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Abilities/GA_Dash.h"
+#include "Abilities/GA_Fireball.h"
+#include "Abilities/GA_AOESlam.h"
+#include "Abilities/GA_Shield.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -109,8 +113,14 @@ void AGASDemoCharacter::SetupPlayerInputComponent(
             &AGASDemoCharacter::Move);
         EIC->BindAction(LookAction, ETriggerEvent::Triggered, this,
             &AGASDemoCharacter::Look);
-        EIC->BindAction(DashAction, ETriggerEvent::Triggered, this,
+        EIC->BindAction(DashAction, ETriggerEvent::Started, this,
             &AGASDemoCharacter::Input_Dash);
+        EIC->BindAction(FireballAction, ETriggerEvent::Started, this,
+            &AGASDemoCharacter::Input_Fireball);
+        EIC->BindAction(AOESlamAction, ETriggerEvent::Started, this,
+            &AGASDemoCharacter::Input_AOESlam);
+        EIC->BindAction(ShieldAction, ETriggerEvent::Started, this,
+            &AGASDemoCharacter::Input_Shield);
     }
 }
 
@@ -142,7 +152,32 @@ void AGASDemoCharacter::Look(const FInputActionValue& Value)
 
 void AGASDemoCharacter::Input_Dash()
 {
-    if (AbilitySystemComponent)
-        AbilitySystemComponent->TryActivateAbilitiesByTag(
-            FGameplayTagContainer(FGameplayTag::RequestGameplayTag("Ability.Dash")));
+    UE_LOG(LogTemp, Warning, TEXT("=== Input_Dash CALLED ==="));
+    if (!AbilitySystemComponent)
+    {
+        UE_LOG(LogTemp, Error, TEXT("ASC is null"));
+        return;
+    }
+    AbilitySystemComponent->TryActivateAbilityByClass(UGA_Dash::StaticClass());
+}
+
+void AGASDemoCharacter::Input_Fireball()
+{
+    UE_LOG(LogTemp, Warning, TEXT("=== Input_Fireball CALLED ==="));
+    if (!AbilitySystemComponent) return;
+    AbilitySystemComponent->TryActivateAbilityByClass(UGA_Fireball::StaticClass());
+}
+
+void AGASDemoCharacter::Input_AOESlam()
+{
+    UE_LOG(LogTemp, Warning, TEXT("=== Input_AOESlam CALLED ==="));
+    if (!AbilitySystemComponent) return;
+    AbilitySystemComponent->TryActivateAbilityByClass(UGA_AOESlam::StaticClass());
+}
+
+void AGASDemoCharacter::Input_Shield()
+{
+    UE_LOG(LogTemp, Warning, TEXT("=== Input_Shield CALLED ==="));
+    if (!AbilitySystemComponent) return;
+    AbilitySystemComponent->TryActivateAbilityByClass(UGA_Shield::StaticClass());
 }

@@ -49,6 +49,18 @@ class AGASDemoCharacter : public ACharacter, public IAbilitySystemInterface
         meta = (AllowPrivateAccess = "true"))
     UInputAction* DashAction;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input,
+        meta = (AllowPrivateAccess = "true"))
+    UInputAction* FireballAction;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input,
+        meta = (AllowPrivateAccess = "true"))
+    UInputAction* AOESlamAction;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input,
+        meta = (AllowPrivateAccess = "true"))
+    UInputAction* ShieldAction;
+
 public:
     AGASDemoCharacter();
 
@@ -70,7 +82,11 @@ public:
 protected:
     void Move(const FInputActionValue& Value);
     void Look(const FInputActionValue& Value);
-    void Input_Dash(const FInputActionValue& Value);
+
+    void Input_Dash();
+    void Input_Fireball();
+    void Input_AOESlam();
+    void Input_Shield();
 
     virtual void BeginPlay() override;
     virtual void SetupPlayerInputComponent(

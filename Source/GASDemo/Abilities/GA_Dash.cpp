@@ -16,41 +16,35 @@ void UGA_Dash::ActivateAbility(
     const FGameplayAbilityActivationInfo ActivationInfo,
     const FGameplayEventData* TriggerEventData)
 {
+    UE_LOG(LogTemp, Error, TEXT("GA_DASH ACTIVATE ABILITY ENTERED"));
     Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
     ACharacter* Character = Cast<ACharacter>(ActorInfo->AvatarActor.Get());
     if (!Character)
     {
+        UE_LOG(LogTemp, Error, TEXT("Dash: Character is null"));
         EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
         return;
     }
 
-    if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
-    {
-        EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
-        return;
-    }
+    UE_LOG(LogTemp, Warning, TEXT("Dash: Character found: %s"), *Character->GetName());
+    UE_LOG(LogTemp, Warning, TEXT("Dash: Controller: %s"),
+        Character->GetController() ? *Character->GetController()->GetName() : TEXT("NULL"));
 
-    // Add invulnerability tag during dash
-    FGameplayTagContainer InvulnTag;
-    InvulnTag.AddTag(FGameplayTag::RequestGameplayTag("State.Invulnerable"));
-    ActorInfo->AbilitySystemComponent->AddLooseGameplayTags(InvulnTag);
-
-    // Launch in the direction the character is facing
     FVector DashDirection = Character->GetActorForwardVector();
-    Character->LaunchCharacter(DashDirection * DashStrength, true, true);
+    UE_LOG(LogTemp, Warning, TEXT("Dash: Direction: %s, Strength: %f"),
+        *DashDirection.ToString(), DashStrength);
 
-    // Remove invulnerability and end ability after dash duration
+    Character->LaunchCharacter(DashDirection * DashStrength, true, true);
+    UE_LOG(LogTemp, Warning, TEXT("Dash: LaunchCharacter called"));
+
     FTimerHandle TimerHandle;
     FGameplayAbilitySpecHandle CapturedHandle = Handle;
     FGameplayAbilityActivationInfo CapturedActivation = ActivationInfo;
 
     Character->GetWorldTimerManager().SetTimer(TimerHandle, [this, ActorInfo,
-        CapturedHandle, CapturedActivation, InvulnTag]()
-    {
-        if (ActorInfo && ActorInfo->AbilitySystemComponent.IsValid())
-            ActorInfo->AbilitySystemComponent->RemoveLooseGameplayTags(InvulnTag);
-
-        EndAbility(CapturedHandle, ActorInfo, CapturedActivation, true, false);
-    }, DashDuration, false);
+        CapturedHandle, CapturedActivation]()
+        {
+            EndAbility(CapturedHandle, ActorInfo, CapturedActivation, true, false);
+        }, DashDuration, false);
 }

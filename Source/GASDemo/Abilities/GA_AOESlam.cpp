@@ -18,6 +18,7 @@ void UGA_AOESlam::ActivateAbility(
     const FGameplayAbilityActivationInfo ActivationInfo,
     const FGameplayEventData* TriggerEventData)
 {
+    UE_LOG(LogTemp, Error, TEXT("GA_AOESLAM ACTIVATE ABILITY ENTERED"));
     Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
     AActor* Avatar = ActorInfo->AvatarActor.Get();

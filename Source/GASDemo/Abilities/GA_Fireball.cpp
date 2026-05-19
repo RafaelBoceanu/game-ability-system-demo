@@ -16,6 +16,7 @@ void UGA_Fireball::ActivateAbility(
     const FGameplayAbilityActivationInfo ActivationInfo,
     const FGameplayEventData* TriggerEventData)
 {
+    UE_LOG(LogTemp, Error, TEXT("GA_FIREBALL ACTIVATE ABILITY ENTERED"));
     Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
     ACharacter* Character = Cast<ACharacter>(ActorInfo->AvatarActor.Get());
