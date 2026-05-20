@@ -18,7 +18,12 @@ void UGA_AOESlam::ActivateAbility(
     const FGameplayAbilityActivationInfo ActivationInfo,
     const FGameplayEventData* TriggerEventData)
 {
-    UE_LOG(LogTemp, Error, TEXT("GA_AOESLAM ACTIVATE ABILITY ENTERED"));
+    if (!DamageEffectClass)
+    {
+        DamageEffectClass = StaticLoadClass(UGameplayEffect::StaticClass(), nullptr,
+            TEXT("/Game/GASDemo/Enemies/GE_AOEDamage.GE_AOEDamage_C"));
+    }
+
     Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
     AActor* Avatar = ActorInfo->AvatarActor.Get();
@@ -36,40 +41,41 @@ void UGA_AOESlam::ActivateAbility(
 
     FGameplayAbilitySpecHandle CapturedHandle = Handle;
     FGameplayAbilityActivationInfo CapturedActivation = ActivationInfo;
+    TSubclassOf<UGameplayEffect> CapturedDamageEffect = DamageEffectClass;
 
-    // Short windup before the slam hits
     FTimerHandle TimerHandle;
     Avatar->GetWorldTimerManager().SetTimer(TimerHandle, [this, Avatar,
-        ActorInfo, CapturedHandle, CapturedActivation]()
-    {
-        if (!Avatar || !ActorInfo) return;
-
-        TArray<FOverlapResult> Overlaps;
-        FCollisionShape Sphere = FCollisionShape::MakeSphere(SlamRadius);
-        FCollisionQueryParams Params;
-        Params.AddIgnoredActor(Avatar);
-
-        GetWorld()->OverlapMultiByChannel(Overlaps, Avatar->GetActorLocation(),
-            FQuat::Identity, ECC_Pawn, Sphere, Params);
-
-        for (FOverlapResult& Overlap : Overlaps)
+        ActorInfo, CapturedHandle, CapturedActivation, CapturedDamageEffect]()
         {
-            UAbilitySystemComponent* TargetASC =
-                UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(
-                    Overlap.GetActor());
+            if (!Avatar || !ActorInfo) return;
 
-            if (TargetASC && DamageEffectClass)
+            TArray<FOverlapResult> Overlaps;
+            FCollisionShape Sphere = FCollisionShape::MakeSphere(SlamRadius);
+            FCollisionQueryParams Params;
+            Params.AddIgnoredActor(Avatar);
+
+            GetWorld()->OverlapMultiByChannel(Overlaps, Avatar->GetActorLocation(),
+                FQuat::Identity, ECC_Pawn, Sphere, Params);
+
+            for (FOverlapResult& Overlap : Overlaps)
             {
-                FGameplayEffectContextHandle Context =
-                    ActorInfo->AbilitySystemComponent->MakeEffectContext();
-                FGameplayEffectSpecHandle Spec =
-                    ActorInfo->AbilitySystemComponent->MakeOutgoingSpec(
-                        DamageEffectClass, 1, Context);
-                ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(
-                    *Spec.Data.Get(), TargetASC);
-            }
-        }
+                UAbilitySystemComponent* TargetASC =
+                    UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(
+                        Overlap.GetActor());
 
-        EndAbility(CapturedHandle, ActorInfo, CapturedActivation, true, false);
-    }, WindupTime, false);
+                if (TargetASC && CapturedDamageEffect)
+                {
+                    FGameplayEffectContextHandle Context =
+                        ActorInfo->AbilitySystemComponent->MakeEffectContext();
+                    FGameplayEffectSpecHandle Spec =
+                        ActorInfo->AbilitySystemComponent->MakeOutgoingSpec(
+                            CapturedDamageEffect, 1, Context);
+                    FActiveGameplayEffectHandle Result =
+                        ActorInfo->AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(
+                            *Spec.Data.Get(), TargetASC);
+                }
+            }
+
+            EndAbility(CapturedHandle, ActorInfo, CapturedActivation, true, false);
+        }, WindupTime, false);
 }

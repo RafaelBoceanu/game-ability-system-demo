@@ -16,27 +16,18 @@ void UGA_Dash::ActivateAbility(
     const FGameplayAbilityActivationInfo ActivationInfo,
     const FGameplayEventData* TriggerEventData)
 {
-    UE_LOG(LogTemp, Error, TEXT("GA_DASH ACTIVATE ABILITY ENTERED"));
     Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
     ACharacter* Character = Cast<ACharacter>(ActorInfo->AvatarActor.Get());
     if (!Character)
     {
-        UE_LOG(LogTemp, Error, TEXT("Dash: Character is null"));
         EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
         return;
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("Dash: Character found: %s"), *Character->GetName());
-    UE_LOG(LogTemp, Warning, TEXT("Dash: Controller: %s"),
-        Character->GetController() ? *Character->GetController()->GetName() : TEXT("NULL"));
-
     FVector DashDirection = Character->GetActorForwardVector();
-    UE_LOG(LogTemp, Warning, TEXT("Dash: Direction: %s, Strength: %f"),
-        *DashDirection.ToString(), DashStrength);
 
     Character->LaunchCharacter(DashDirection * DashStrength, true, true);
-    UE_LOG(LogTemp, Warning, TEXT("Dash: LaunchCharacter called"));
 
     FTimerHandle TimerHandle;
     FGameplayAbilitySpecHandle CapturedHandle = Handle;

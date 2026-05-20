@@ -14,7 +14,12 @@ void UGA_Shield::ActivateAbility(
     const FGameplayAbilityActivationInfo ActivationInfo,
     const FGameplayEventData* TriggerEventData)
 {
-    UE_LOG(LogTemp, Error, TEXT("GA_SHIELD ACTIVATE ABILITY ENTERED"));
+    if (!ShieldEffectClass)
+    {
+        ShieldEffectClass = StaticLoadClass(UGameplayEffect::StaticClass(), nullptr,
+            TEXT("/Game/GASDemo/Enemies/GE_Shield.GE_Shield_C"));
+    }
+
     Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
     if (!CommitAbility(Handle, ActorInfo, ActivationInfo))

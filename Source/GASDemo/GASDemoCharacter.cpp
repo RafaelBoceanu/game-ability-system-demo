@@ -152,10 +152,8 @@ void AGASDemoCharacter::Look(const FInputActionValue& Value)
 
 void AGASDemoCharacter::Input_Dash()
 {
-    UE_LOG(LogTemp, Warning, TEXT("=== Input_Dash CALLED ==="));
     if (!AbilitySystemComponent)
     {
-        UE_LOG(LogTemp, Error, TEXT("ASC is null"));
         return;
     }
     AbilitySystemComponent->TryActivateAbilityByClass(UGA_Dash::StaticClass());
@@ -163,21 +161,18 @@ void AGASDemoCharacter::Input_Dash()
 
 void AGASDemoCharacter::Input_Fireball()
 {
-    UE_LOG(LogTemp, Warning, TEXT("=== Input_Fireball CALLED ==="));
     if (!AbilitySystemComponent) return;
     AbilitySystemComponent->TryActivateAbilityByClass(UGA_Fireball::StaticClass());
 }
 
 void AGASDemoCharacter::Input_AOESlam()
 {
-    UE_LOG(LogTemp, Warning, TEXT("=== Input_AOESlam CALLED ==="));
     if (!AbilitySystemComponent) return;
     AbilitySystemComponent->TryActivateAbilityByClass(UGA_AOESlam::StaticClass());
 }
 
 void AGASDemoCharacter::Input_Shield()
 {
-    UE_LOG(LogTemp, Warning, TEXT("=== Input_Shield CALLED ==="));
     if (!AbilitySystemComponent) return;
     AbilitySystemComponent->TryActivateAbilityByClass(UGA_Shield::StaticClass());
 }
